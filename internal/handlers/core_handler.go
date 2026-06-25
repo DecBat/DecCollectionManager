@@ -1,10 +1,13 @@
 package handlers
 
+import "github.com/DecBat/DecCollectionManager/internal/store"
+
 type Handler struct {
 	// DB instance
 	// Query stores
+	queries *store.Queries
 }
 
-func NewHandlers() *Handler {
-	return &Handler{}
+func NewHandlers(queries *store.Queries) *Handler {
+	return &Handler{queries: queries}
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/DecBat/DecCollectionManager/dbconfig"
 	"github.com/DecBat/DecCollectionManager/internal/handlers"
 	"github.com/DecBat/DecCollectionManager/internal/routes"
+	"github.com/DecBat/DecCollectionManager/internal/store"
 	"github.com/DecBat/DecCollectionManager/serverconfig"
 )
 
@@ -21,7 +22,8 @@ func main() {
 	db := dbconfig.ConnectDB(config.DatabaseURL)
 	defer db.Close()
 	// Create a new handler
-	handler := handlers.NewHandlers()
+	queries := store.New(db)
+	handler := handlers.NewHandlers(queries)
 
 	// set up the HTTP server
 	mux := http.NewServeMux()
