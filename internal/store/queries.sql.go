@@ -85,6 +85,36 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (CreateU
 	return i, err
 }
 
+const deleteItem = `-- name: DeleteItem :exec
+DELETE FROM items
+WHERE id = $1
+`
+
+func (q *Queries) DeleteItem(ctx context.Context, id int32) error {
+	_, err := q.exec(ctx, q.deleteItemStmt, deleteItem, id)
+	return err
+}
+
+const getItem = `-- name: GetItem :one
+SELECT id, title, price, user_id, created, updated
+FROM items
+WHERE id = $1
+`
+
+func (q *Queries) GetItem(ctx context.Context, id int32) (Item, error) {
+	row := q.queryRow(ctx, q.getItemStmt, getItem, id)
+	var i Item
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Price,
+		&i.UserID,
+		&i.Created,
+		&i.Updated,
+	)
+	return i, err
+}
+
 const getUser = `-- name: GetUser :one
 SELECT id, username, email, created, updated
 FROM users
@@ -189,4 +219,31 @@ func (q *Queries) ListUsers(ctx context.Context) ([]ListUsersRow, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateItem = `-- name: UpdateItem :one
+UPDATE items
+SET title = $1, price = $2, updated = CURRENT_TIMESTAMP
+WHERE id = $3
+RETURNING id, title, price, user_id, created, updated
+`
+
+type UpdateItemParams struct {
+	Title string `json:"title"`
+	Price int32  `json:"price"`
+	ID    int32  `json:"id"`
+}
+
+func (q *Queries) UpdateItem(ctx context.Context, arg UpdateItemParams) (Item, error) {
+	row := q.queryRow(ctx, q.updateItemStmt, updateItem, arg.Title, arg.Price, arg.ID)
+	var i Item
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Price,
+		&i.UserID,
+		&i.Created,
+		&i.Updated,
+	)
+	return i, err
 }

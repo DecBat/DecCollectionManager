@@ -30,6 +30,12 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.createUserStmt, err = db.PrepareContext(ctx, createUser); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateUser: %w", err)
 	}
+	if q.deleteItemStmt, err = db.PrepareContext(ctx, deleteItem); err != nil {
+		return nil, fmt.Errorf("error preparing query DeleteItem: %w", err)
+	}
+	if q.getItemStmt, err = db.PrepareContext(ctx, getItem); err != nil {
+		return nil, fmt.Errorf("error preparing query GetItem: %w", err)
+	}
 	if q.getUserStmt, err = db.PrepareContext(ctx, getUser); err != nil {
 		return nil, fmt.Errorf("error preparing query GetUser: %w", err)
 	}
@@ -38,6 +44,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	}
 	if q.listUsersStmt, err = db.PrepareContext(ctx, listUsers); err != nil {
 		return nil, fmt.Errorf("error preparing query ListUsers: %w", err)
+	}
+	if q.updateItemStmt, err = db.PrepareContext(ctx, updateItem); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateItem: %w", err)
 	}
 	return &q, nil
 }
@@ -54,6 +63,16 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing createUserStmt: %w", cerr)
 		}
 	}
+	if q.deleteItemStmt != nil {
+		if cerr := q.deleteItemStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deleteItemStmt: %w", cerr)
+		}
+	}
+	if q.getItemStmt != nil {
+		if cerr := q.getItemStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getItemStmt: %w", cerr)
+		}
+	}
 	if q.getUserStmt != nil {
 		if cerr := q.getUserStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getUserStmt: %w", cerr)
@@ -67,6 +86,11 @@ func (q *Queries) Close() error {
 	if q.listUsersStmt != nil {
 		if cerr := q.listUsersStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing listUsersStmt: %w", cerr)
+		}
+	}
+	if q.updateItemStmt != nil {
+		if cerr := q.updateItemStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateItemStmt: %w", cerr)
 		}
 	}
 	return err
@@ -110,9 +134,12 @@ type Queries struct {
 	tx             *sql.Tx
 	createItemStmt *sql.Stmt
 	createUserStmt *sql.Stmt
+	deleteItemStmt *sql.Stmt
+	getItemStmt    *sql.Stmt
 	getUserStmt    *sql.Stmt
 	listItemsStmt  *sql.Stmt
 	listUsersStmt  *sql.Stmt
+	updateItemStmt *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
@@ -121,8 +148,11 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		tx:             tx,
 		createItemStmt: q.createItemStmt,
 		createUserStmt: q.createUserStmt,
+		deleteItemStmt: q.deleteItemStmt,
+		getItemStmt:    q.getItemStmt,
 		getUserStmt:    q.getUserStmt,
 		listItemsStmt:  q.listItemsStmt,
 		listUsersStmt:  q.listUsersStmt,
+		updateItemStmt: q.updateItemStmt,
 	}
 }

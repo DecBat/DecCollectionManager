@@ -22,3 +22,19 @@ VALUES ($1, $2, $3, $4, $5)
 SELECT id, title, price, user_id, created, updated
 FROM items
 ORDER BY id;
+
+-- name: GetItem :one
+SELECT id, title, price, user_id, created, updated
+FROM items
+WHERE id = $1;
+
+-- name: UpdateItem :one
+UPDATE items
+SET title = $1, price = $2, updated = CURRENT_TIMESTAMP
+WHERE id = $3
+RETURNING id, title, price, user_id, created, updated;
+
+-- name: DeleteItem :exec
+DELETE FROM items
+WHERE id = $1;
+
