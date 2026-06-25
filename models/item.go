@@ -1,7 +1,0 @@
-package models
-
-type Item struct{
-	ID int 'json:"id"'
-	Title string 'json:"title"'
-	Price float64 'json:"price"'
-}
