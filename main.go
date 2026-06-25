@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/DecBat/DecCollectionManager/dbconfig"
 	"github.com/DecBat/DecCollectionManager/internal/handlers"
 	"github.com/DecBat/DecCollectionManager/internal/routes"
 	"github.com/DecBat/DecCollectionManager/serverconfig"
@@ -16,6 +17,9 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to load config %v", err)
 	}
+	// Connect to db
+	db := dbconfig.ConnectDB(config.DatabaseURL)
+	defer db.Close()
 	// Create a new handler
 	handler := handlers.NewHandlers()
 
