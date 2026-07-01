@@ -24,6 +24,12 @@ type UserResponse struct {
 	Updated  *time.Time `json:"updated"`
 }
 
+type CreateItemRequest struct {
+	Title  string `json:"title"`
+	Price  int32  `json:"price"`
+	UserID *int32 `json:"user_id"`
+}
+
 func nullInt32ToPtr(n sql.NullInt32) *int32 {
 	if !n.Valid {
 		return nil
